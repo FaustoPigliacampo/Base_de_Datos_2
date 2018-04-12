@@ -34,7 +34,7 @@ AND store.store_id = 1;
 SELECT film1.title, film1.rating, film2.rating, film2.title
 FROM film film1, film film2
 WHERE film1.rating = film2.rating
-AND film1.title != film2.title
+AND film1.title != film2.title;
 
 
 SELECT title, first_name, last_name , address.address
