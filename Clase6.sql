@@ -1,4 +1,5 @@
 1)
+
 SELECT a1.first_name, a1.last_name
 FROM actor a1
 WHERE EXISTS (SELECT *
@@ -66,38 +67,27 @@ WHERE EXISTS (
 
 
 
-ARREGLAR [[[[
-
-
 7)
 SELECT first_name, last_name
-FROM actor a
-WHERE EXISTS (
-    SELECT *
-    FROM film_actor f_a
-    WHERE a.actor_id = f_a.actor_id
-    AND EXISTS (
-        SELECT * 
-        FROM film f
-        WHERE f.film_id = f_a.film_id
-        AND (title LIKE ('CATCH AMISTAD') AND title LIKE ('BETRAYED REAR'))));
-            
+FROM actor
+WHERE actor_id IN(
+        SELECT actor_id
+        FROM film,film_actor 
+        WHERE film.film_id=film_actor.film_id 
+        AND (film.title LIKE 'BETRAYED REAR')) 
+AND actor_id IN (
+        SELECT actor_id
+        FROM film,film_actor 
+        WHERE film.film_id=film_actor.film_id 
+        AND (film.title LIKE 'CATCH AMISTAD'));
+
 
 
 8)
-SELECT *
-FROM actor q1
-WHERE EXISTS (
-    SELECT *
-    FROM film_actor q2
-    WHERE q1.actor_id = q2.actor_id
-    AND EXISTS (
-        SELECT * 
-        FROM film q3
-        WHERE q3.film_id = q2.film_id
-        AND title NOT LIKE ('BETRAYED REAR') OR ('CATCH AMISTAD')
-    )
-);
-
-
-]]]]
+SELECT first_name, last_name
+FROM actor
+WHERE actor_id NOT IN(
+        SELECT actor_id
+        FROM film,film_actor 
+        WHERE film.film_id=film_actor.film_id 
+        AND (film.title LIKE ('BETRAYED REAR') OR film.title LIKE ('CATCH AMISTAD')));
