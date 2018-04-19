@@ -1,5 +1,4 @@
 1)
-
 SELECT a1.first_name, a1.last_name
 FROM actor a1
 WHERE EXISTS (SELECT *
@@ -19,18 +18,21 @@ WHERE actor_id NOT IN (SELECT DISTINCT actor_id
                 
 
 3)
-SELECT DISTINCT r1.customer_id
-FROM rental r1
-WHERE NOT EXISTS (SELECT *
+SELECT DISTINCT r1.customer_id, c.first_name, c.last_name
+FROM rental r1, customer c
+WHERE c.customer_id = r1.customer_id
+AND NOT EXISTS (SELECT *
                 FROM rental r2
                 WHERE r1.customer_id = r2.customer_id
                 AND r1.rental_id != r2.rental_id);
 
 
+
 4)
-SELECT DISTINCT r1.customer_id
-FROM rental r1
-WHERE EXISTS (SELECT *
+SELECT DISTINCT r1.customer_id, c.first_name, c.last_name
+FROM rental r1, customer c
+WHERE c.customer_id = r1.customer_id
+AND EXISTS (SELECT *
                 FROM rental r2
                 WHERE r1.customer_id = r2.customer_id
                 AND r1.rental_id != r2.rental_id);
