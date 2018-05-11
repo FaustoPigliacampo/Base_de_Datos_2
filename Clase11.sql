@@ -30,3 +30,32 @@ INNER JOIN rental
 	ON rental.customer_id = customer.customer_id
 GROUP BY customer.customer_id
 ORDER BY amount DESC;
+
+
+4)
+SELECT film_id, title
+FROM film
+WHERE film_id NOT IN (SELECT film_id FROM inventory);
+
+
+5)
+SELECT title, inventory_id
+FROM film, inventory
+WHERE film.film_id = inventory.film_id
+AND film.film_id IN (SELECT film_id FROM inventory)
+AND title NOT IN (SELECT DISTINCT film.title
+					FROM film, inventory, rental
+					WHERE film.film_id = inventory.film_id
+					AND inventory.inventory_id = rental.inventory_id);
+
+
+6)
+SELECT customer.last_name, customer.first_name, store.store_id, film.title
+FROM rental, film,customer,store, staff, inventory
+WHERE return_date IS NULL 
+AND rental.customer_id = customer.customer_id
+AND store.store_id = staff.store_id
+AND staff.staff_id = rental.staff_id
+AND film.film_id = inventory.film_id
+AND inventory.inventory_id = rental.inventory_id
+ORDER BY store.store_id, customer.last_name;
