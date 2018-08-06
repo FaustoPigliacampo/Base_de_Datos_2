@@ -77,6 +77,11 @@ DELETE FROM film_category WHERE film_id = (SELECT film_id FROM film LIMIT 1);
 -- Eliminamos todos los registros que tengan esa pelicula de la tabla 'film_actor'.
 DELETE FROM film_actor WHERE film_id = (SELECT film_id FROM film LIMIT 1);
 
+-- Eliminamos el payment de los rental
+DELETE FROM payment WHERE rental_id IN
+(SELECT rental_id FROM rental WHERE inventory_id IN
+(SELECT inventory_id FROM inventory WHERE film_id = (SELECT film_id FROM film LIMIT 1)));
+
 -- Eliminamos todos los registros de rentas de los inventarios que pertenezcan a nuesta pelicula.
 DELETE FROM rental WHERE inventory_id IN
 (SELECT inventory_id FROM inventory WHERE film_id = (SELECT film_id FROM film LIMIT 1));
@@ -106,14 +111,14 @@ VALUES
 103,
 (SELECT customer_id
 FROM customer
-WHERE customer.first_name LIKE 'Fausto'
-AND customer.last_name LIKE 'Pigliacampo'),
+WHERE customer.store_id = (SELECT store_id
+							FROM inventory
+							WHERE inventory_id = 103)),
 (SELECT staff_id
 FROM staff
 WHERE staff.store_id = (SELECT store_id
 						FROM inventory
-						WHERE inventory_id = 103
-						LIMIT 1)));
+						WHERE inventory_id = 103)));
 
 
 INSERT INTO payment
@@ -121,21 +126,18 @@ INSERT INTO payment
 VALUES
 ((SELECT customer_id
 FROM customer
-WHERE customer.first_name LIKE 'Fausto'
-AND customer.last_name LIKE 'Pigliacampo'),
+WHERE customer.store_id = (SELECT store_id
+							FROM inventory
+							WHERE inventory_id = 103))
 (SELECT staff_id
 FROM staff
 WHERE staff.store_id = (SELECT store_id
 						FROM inventory
-						WHERE inventory_id = 103
-						LIMIT 1)),
+						WHERE inventory_id = 103)),
 (SELECT rental_id
 FROM rental
 WHERE rental.inventory_id = 103
-AND rental.customer_id = (SELECT customer_id
-							FROM customer
-							WHERE customer.first_name LIKE 'Fausto'
-							AND customer.last_name LIKE 'Pigliacampo')),
+AND rental.return_date IS NULL),
 (SELECT film.rental_rate
 FROM film
 INNER JOIN inventory USING (film_id)
