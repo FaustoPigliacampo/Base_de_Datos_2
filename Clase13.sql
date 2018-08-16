@@ -117,9 +117,9 @@ WHERE customer.store_id = (SELECT store_id
 (SELECT staff_id
 FROM staff
 WHERE staff.store_id = (SELECT store_id
-						FROM inventory
-						WHERE inventory_id = 103)));
-
+			FROM inventory
+			WHERE inventory_id = 103
+			LIMIT 1)));
 
 INSERT INTO payment
 (customer_id, staff_id, rental_id, amount)
@@ -132,12 +132,16 @@ WHERE customer.store_id = (SELECT store_id
 (SELECT staff_id
 FROM staff
 WHERE staff.store_id = (SELECT store_id
-						FROM inventory
-						WHERE inventory_id = 103)),
+			FROM inventory
+			WHERE inventory_id = 103
+			LIMIT 1)),
 (SELECT rental_id
 FROM rental
 WHERE rental.inventory_id = 103
-AND rental.return_date IS NULL),
+AND rental.customer_id = (SELECT customer_id
+				FROM customer
+				WHERE customer.first_name LIKE 'Fausto'
+				AND customer.last_name LIKE 'Pigliacampo')),
 (SELECT film.rental_rate
 FROM film
 INNER JOIN inventory USING (film_id)
