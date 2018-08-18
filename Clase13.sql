@@ -17,11 +17,10 @@ INSERT INTO rental
 (rental_date, inventory_id, customer_id, staff_id)
 VALUES
 (CURRENT_TIMESTAMP,
-(SELECT inventory_id
-FROM inventory
-INNER JOIN film USING (film_id)
-WHERE title LIKE 'UNTOUCHABLES SUNRISE'
-LIMIT 1),
+(SELECT inventory_id FROM inventory
+	INNER JOIN film USING (film_id)
+	WHERE title LIKE 'UNTOUCHABLES SUNRISE'
+	LIMIT 1),
 (SELECT customer_id FROM customer WHERE store_id = 2 LIMIT 1),
 (SELECT staff_id FROM staff WHERE store_id = 2 LIMIT 1));
 
@@ -53,9 +52,8 @@ ________________________________________________________________________________
 
 4-
 
-SELECT MAX(rental_id) FROM film
-INNER JOIN inventory USING (film_id)
-INNER JOIN rental t USING (inventory_id)
+SELECT MAX(rental_id)
+FROM rental t
 WHERE t.return_date IS NULL;
 
 UPDATE rental
@@ -113,13 +111,13 @@ VALUES
 FROM customer
 WHERE customer.store_id = (SELECT store_id
 							FROM inventory
-							WHERE inventory_id = 103)),
+							WHERE inventory_id = 103) LIMIT 1),
 (SELECT staff_id
 FROM staff
 WHERE staff.store_id = (SELECT store_id
-			FROM inventory
-			WHERE inventory_id = 103
-			LIMIT 1)));
+						FROM inventory
+						WHERE inventory_id = 103) LIMIT 1));
+
 
 INSERT INTO payment
 (customer_id, staff_id, rental_id, amount)
@@ -128,20 +126,15 @@ VALUES
 FROM customer
 WHERE customer.store_id = (SELECT store_id
 							FROM inventory
-							WHERE inventory_id = 103))
+							WHERE inventory_id = 103) LIMIT 1)
 (SELECT staff_id
 FROM staff
 WHERE staff.store_id = (SELECT store_id
-			FROM inventory
-			WHERE inventory_id = 103
-			LIMIT 1)),
+						FROM inventory
+						WHERE inventory_id = 103) LIMIT 1)),
 (SELECT rental_id
 FROM rental
-WHERE rental.inventory_id = 103
-AND rental.customer_id = (SELECT customer_id
-				FROM customer
-				WHERE customer.first_name LIKE 'Fausto'
-				AND customer.last_name LIKE 'Pigliacampo')),
+WHERE rental.inventory_id = 103),
 (SELECT film.rental_rate
 FROM film
 INNER JOIN inventory USING (film_id)
@@ -149,5 +142,4 @@ WHERE inventory_id = 103));
 
 __________________________________________________________________________________________________________________
 
-
-Once you're done. Restore the database data using the populate script from class 3.
+-- Once you're done. Restore the database data using the populate script from class 3.
