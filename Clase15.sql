@@ -79,11 +79,38 @@ SELECT * FROM actor_information;
 #5) Analyze view actor_info, explain the entire query and specially how the sub query works.
 #	Be very specific, take some time and decompose each part and give an explanation for each. 
 
-SELECT * FROM actor_info;
 
-Muestra el id de actor, el first_name y el last_name.
-En la columna film_info muestra POR CATEGORIA, en que films de esa categoria participó el actor.
-
+select `a`.`actor_id` AS `actor_id`, `a`.`first_name` AS `first_name`, `a`.`last_name` AS `last_name`,
+#Seleccionamos el id, first_name y last_name de actor
+	group_concat(
+		distinct concat(
+			`c`.`name`, ': ',(
+			#Nos muestra el nombre de todas las categorías y ...
+				select group_concat( `f`.`title` order by `f`.`title` ASC separator ', ' )
+				#... las peliculas que pertenecen a esa categoria, en las cuales participo el actor, separadas por ', '
+					from(( `sakila`.`film` `f`
+						join `sakila`.`film_category` `fc` on(( `f`.`film_id` = `fc`.`film_id` )))
+						#Hacemos un JOIN de film_category con la tabla film, cuando los film_id sean iguales
+						join `sakila`.`film_actor` `fa` on(( `f`.`film_id` = `fa`.`film_id` )))
+						#Hacemos un JOIN de film_actor con la tabla film, cuando los film_id sean iguales
+					where(( `fc`.`category_id` = `c`.`category_id` )
+					#Comparamos los category_id de ambas tablas
+						and( `fa`.`actor_id` = `a`.`actor_id` )))
+						#Comparamos los actor_id de ambas tablas
+		)order by `c`.`name` ASC separator '; '
+		#Ordenamos las categorias en orden ascendente, y las separamos con '; '
+	) AS `film_info`
+	#Nombramos a la cuarta columna como 'film_info'
+from ((( `sakila`.`actor` `a`
+		left join `sakila`.`film_actor` `fa` on ( `a`.`actor_id` = `fa`.`actor_id` ))
+		left join `sakila`.`film_category` `fc` on ( `fa`.`film_id` = `fc`.`film_id` ))
+		left join `sakila`.`category` `c` on( `fc`.`category_id` = `c`.`category_id` )
+#Añadimos todas las tablas de las que se va a juntar información
+group by `a`.`actor_id`, `a`.`first_name`, `a`.`last_name`;
+#Agrupamos por las tres primeras columnas
 
 
 #6) Materialized views, write a description, why they are used, alternatives, DBMS were they exist, etc.
+
+Son vistas que  muestran su resultado en una tabla temporaria.
+Se utilizan para no tener que repetir una misma query varias veces, y para tener un acceso mas rapido a la informacion.
