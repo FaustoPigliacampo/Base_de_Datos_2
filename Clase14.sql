@@ -25,8 +25,8 @@ SELECT title, release_year
 FROM film
 WHERE film_id IN (SELECT film_id FROM film_actor
 					INNER JOIN actor USING (actor_id)
-					WHERE TRIM(LOWER(CONCAT(actor.first_name, ' ', actor.last_name)))
-					LIKE TRIM(LOWER(REPLACE(REPLACE(' ZeRO, CAge. ', ',', ''), '.', ''))));
+					WHERE TRIM(LOWER(REPLACE(CONCAT(actor.first_name, ' ', actor.last_name), ' ', '')))
+					LIKE TRIM(LOWER(REPLACE(REPLACE(REPLACE(' ZeRO, CAge. ', ' ', ''), ',', ''), '.', ''))));
 
 
 #4)
@@ -50,7 +50,7 @@ SELECT CAST((SELECT CURRENT_TIME) AS CHAR);
 
 #6)
 # En mysql podemos usar IFNULL() o COALESCE().
-# Ambas funciones tienen la misma funcion: Detectar un valor nulo y reemplazarlo.
+# Ambas funciones hacen lo mismo: Detectar un valor nulo y reemplazarlo.
 
 SELECT f.title, inventory_id, IFNULL(return_date, 'No devuelta')
 FROM rental
